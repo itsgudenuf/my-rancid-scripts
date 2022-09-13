@@ -178,9 +178,10 @@ sub ShowVersion {
     while (<INPUT>) {
         tr/\015//d;
         last if(/^$prompt/);
+        /System Time.*$/ && next;
+        /System Uptime.*$/ && next;
+        /MEMORY.*$/ && next;
 
-        /(Copyright|uptime|restarted|^\s*$)/ && next;
-        /(Up Time|Boot Time)/ && next;
         ProcessHistory("COMMENTS","keysort","A1","!Image: $_");
     }
     return;
