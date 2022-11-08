@@ -1,0 +1,92 @@
+#! /bin/bash
+#
+# cmb450rancid    1.0
+# Brian Walters <brian@walters.guru>
+#
+# Pulls configs from Cambium 450i units via webUI
+# You must have a user configured w/ administrator rights
+# Currently does not support wildcards in the .cloginrc 
+# create a user & password entry for each host
+#
+#
+
+
+
+function finish_up() {
+      rm -f $COOKIE_FILE  
+}
+
+
+
+
+if [ "$#" -ne 1 ]; then
+	echo "USAGE: $0 DEVICE_NAME"
+	exit
+fi
+
+if [ ! -f "$HOME/.cloginrc" ]; then
+        echo ".cloginrc is missing."
+        echo "MAKE SURE YOU ARE RUNNING AS RANCID"
+        exit
+fi
+
+RADIO_NAME=$1
+
+OUTFILE="$RADIO_NAME.new"
+
+rm -f $OUTFILE
+
+
+COOKIE_FILE=$(mktemp -u --suffix ".cambium450")
+
+RADIO_USER=`grep $RADIO_NAME $HOME/.cloginrc | grep user  | cut -f 4 -d ' '`
+RADIO_PASS=`grep $RADIO_NAME $HOME/.cloginrc | grep password  | cut -f 4 -d ' '`
+
+if [[ -z "$RADIO_USER" || -z "$RADIO_PASS" ]]; then
+        echo "Check user and password values in .cloginrc" | tee -a $OUTFILE
+        finish_up 
+        exit
+fi
+
+
+# This really helped me solve the cookie issue
+# https://michlstechblog.info/blog/curl-login-and-get-a-website-protected-by-a-php-session/
+
+
+# MAC_ESN=`curl -s -X GET http://$RADIO_NAME/ | grep mac_esn | grep meta | cut -d '?' -f 2 | cut -d "'" -f 1 | cut -d '=' -f 2`
+
+# echo "mac_esn=$MAC_ESN"
+
+
+# rm -f $COOKIE_FILE
+# #echo "Logging into http://$RADIO_NAME"
+
+
+# curl -s -X POST -c $COOKIE_FILE -b $COOKIE_FILE \
+#         -H "Content-Type: application/x-www-form-urlencoded" \
+#         -d "mac_esn=$MAC_ESN&Session=0&CanopyUsername=$RADIO_USER&CanopyPassword=$RADIO_PASS" \
+#         http://$RADIO_NAME/login.cgi > /dev/null
+
+# echo -e "\n\n\n\n\n\n"
+
+# echo "Confirming we are logged in"
+# LOGGEDIN=`curl -s -c $COOKIE_FILE -b $COOKIE_FILE -X GET http://$RADIO_NAME/main.cgi | grep "Account:" | grep $RADIO_USER | wc -l`
+
+# if [ "$LOGGEDIN" -ne 1 ]; then
+# 	echo "Login FAILED" | tee -a $OUTFILE
+#         finish_up 
+# 	exit
+# fi
+
+# curl -s -c $COOKIE_FILE -b $COOKIE_FILE \
+#         -X GET  http://$RADIO_NAME/canopy_config.cgi?mac_esn=$MAC_ESN | \
+#         grep -v "cfgUtcTimestamp" > $OUTFILE
+
+# cfgUtcTimestamp changes every time I pull the config
+
+# per a support ticket, looks like I can do this with a single command
+
+curl "http://$RADIO_NAME/canopy_config.cgi?CanopyUsername=$RADIO_USER&CanopyPassword=$RADIO_PASS" | \
+        grep -v "cfgUtcTimestamp" > $OUTFILE
+
+finish_up
