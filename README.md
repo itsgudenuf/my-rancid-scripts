@@ -28,4 +28,19 @@ mxlogin - adjusted for the "login as:" prompt.
 mxrancid - derived from mrancid to drive mxlogin  
 -  needed show running-config instead of show config
 
+# HP 1950 Switches  
+you need to the following in .cloginrc  
+add user 1950-* admin  
+add password 1950-* REGULAR_PASSWORD foes-bent-pile-atom-ship  
+add enable 1950-* {1}  
+add enablecmd 1950-* xtd-cli-mode  
+
+hp1950login - modified from hp1950login  
+hp1950rancid -  modified from h3rancid and hp1910rancid  
+ - several the options were disabled to make the script complete
+
+
+
+
+
 
