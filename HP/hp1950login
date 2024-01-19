@@ -846,19 +846,19 @@ foreach router [lrange $argv $i end] {
                                   regsub -all "\[\]\[\(\)+]" $junk {\\&} prompt;
                                 }
     }
-    if { $do_command || $do_script } {
-                send "_cmdline-mode on\r"
-                expect {
-                -re "All commands can be displayed*" {send -- "Y\r"; exp_continue}
-            	-re "Please input password:" {send -- "512900\r"; exp_continue}
-            	">"             { set prompt ">" }
-            	-re "Error: Invalid password." {
-                         send_user "\nError: Check your Enable passwd\n"
-                         return 1
-                        }
-        		-re $prompt      {}
-                }
-    }
+#    if { $do_command || $do_script } {
+#                send "_cmdline-mode on\r"
+#                expect {
+#                -re "All commands can be displayed*" {send -- "Y\r"; exp_continue}
+#            	-re "Please input password:" {send -- "512900\r"; exp_continue}
+#            	">"             { set prompt ">" }
+#            	-re "Error: Invalid password." {
+#                         send_user "\nError: Check your Enable passwd\n"
+#                         return 1
+#                        }
+#        		-re $prompt      {}
+#                }
+#    }
     if { $do_command } {
         if {[run_commands $prompt $command]} {
             incr exitval
